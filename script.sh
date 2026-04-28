@@ -15,6 +15,7 @@ function ok {
 
 function nok {
   echo -e "[ \e[38;5;31mfailure\e[0m ]"
+  exit 1
 }
 
 function warn {
@@ -79,7 +80,8 @@ check setting qemu capabilities;       sudo setcap                              
                                          CAP_NET_ADMIN,CAP_NET_RAW=eip                  \
                                          /usr/local/bin/qemu                            >/dev/null 2>&1 && ok || nok
 
-check getting qemu disk image;         wget -O - ${qdisk}/qdisk.part-a{a..c} |bunzip2   >qdisk.img 2>&1 && ok || nok
+check getting qemu disk image;         wget -q -O - ${qdisk}/qdisk.part-a{a..c}         \
+                                         |bunzip2 >qdisk.img                            2>/dev/null     && ok || nok
 
 
 
@@ -94,7 +96,7 @@ check make the debug version;          make                                     
 check make the rest of it;             make all                                         >/dev/null 2>&1 && ok || nok
 check make capstone;                   make build/capstone-x86.min.js                   >/dev/null 2>&1 && ok || nok
 check make libwabt;                    make build/libwabt.cjs                           >/dev/null 2>&1 && ok || nok
-check make xterm;                      build/xterm.js                                   >/dev/null 2>&1 && ok || nok
+check make xterm;                      make build/xterm.js                              >/dev/null 2>&1 && ok || nok
 
 
 
