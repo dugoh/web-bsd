@@ -1,0 +1,41 @@
+name: Execute Code Base
+on:
+  push:
+    branches-ignore: [scratch]
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@main
+      - name: Setup toolchain
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup target add wasm32-unknown-unknown
+          rustup component add rustfmt
+      - name: Install packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install vsftpd libncursesw5-dev libtinfo-dev libc6-dev-i386
+      - name: Execute main script file
+        run: |
+           ./init.sh
+           ./script.sh
+#      - name: Init new repo in dist folder and commit generated files
+#        run: |
+#          pwd
+#          ls -l
+#          ls -ltrd $(find ./gh-pages)
+#          cd gh-pages
+#          git init
+#          git add -A
+#          git config --local user.email "action@github.com"
+#          git config --local user.name "GitHub Action"
+#          git commit -m 'deploy'
+#      - name: Force push to gh-pages
+#        uses: ad-m/github-push-action@master
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+#          branch: gh-pages
+#          force: true
+#          directory: ./gh-pages
