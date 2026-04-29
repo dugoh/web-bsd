@@ -106,7 +106,7 @@ check convert disk;                    qemu-img convert \
                                          -f qcow2 -O raw qdisk.img disk.img             >/dev/null 2>&1 && ok || nok
 
 check split disk;                      ../tools/split-image.py --zstd \
-                                         28m disk.img 386bsd-disk-%d-%d.img             >/dev/null 2>&1 && ok || nok
+                                         28m disk.img 386bsd/disk-%d-%d.img             >/dev/null 2>&1 && ok || nok
 rm *disk.img || exit 1
 
 
