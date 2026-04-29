@@ -116,7 +116,7 @@ check split disk;                      ../tools/split-image.py --zstd \
 
 )|format
 
-find ./ >&2
+ls -ltrd `find ./ |fgrep .img`
 
 # list of proper splits
 #2	252
