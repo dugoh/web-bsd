@@ -95,7 +95,7 @@ check make the rest of it;             make all                                 
 check make capstone;                   make build/capstone-x86.min.js                   >/dev/null 2>&1 && ok || nok
 check make libwabt;                    make build/libwabt.cjs                           >/dev/null 2>&1 && ok || nok
 check make xterm;                      make build/xterm.js                              >/dev/null 2>&1 && ok || nok
-patch split script                     sed -i -e 's/) = sys.argv/) = args/' \
+patch split script;                    sed -i -e 's/) = sys.argv/) = args/' \
                                          tools/split-image.py                           >/dev/null 2>&1 && ok || nok
 
 mkdir images || exit 1
