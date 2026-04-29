@@ -80,9 +80,7 @@ check setting qemu capabilities;       sudo setcap                              
                                          CAP_NET_ADMIN,CAP_NET_RAW=eip                  \
                                          /usr/local/bin/qemu                            >/dev/null 2>&1 && ok || nok
 
-check getting qemu disk image;         wget -q -O - ${qdisk}/qdisk.part-a{a..c}         \
-                                         |bunzip2 >qdisk.img                            2>/dev/null     && ok || nok
-
+                                         
 
 
 
@@ -99,6 +97,20 @@ check make libwabt;                    make build/libwabt.cjs                   
 check make xterm;                      make build/xterm.js                              >/dev/null 2>&1 && ok || nok
 
 
+mkdir images || exit 1
+cd images || exit 1
+check getting qemu disk image;         wget -q -O - ${qdisk}/qdisk.part-a{a..c}         \
+                                         |bunzip2 >qdisk.img                            2>/dev/null     && ok || nok
+check convert disk;                    qemu-img convert \
+                                         -f qcow2 -O raw qdisk.img t                    >/dev/null 2>&1 && ok || nok
+
+check split disk;                      ../tools/split-image.py --zstd 32m t disk-%d-%d.img     >/dev/null 2>&1 && ok || nok
+rm t || exit 1
+
+
+ls -ltr
 
 
 )|format
+
+
