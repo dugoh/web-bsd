@@ -95,7 +95,7 @@ check make the rest of it;             make all                                 
 check make capstone;                   make build/capstone-x86.min.js                   >/dev/null 2>&1 && ok || nok
 check make libwabt;                    make build/libwabt.cjs                           >/dev/null 2>&1 && ok || nok
 check make xterm;                      make build/xterm.js                              >/dev/null 2>&1 && ok || nok
-patch split script;                    sed -i -e 's/) = sys.argv/) = args/' \
+check patch split script;              sed -i -e 's/) = sys.argv/) = args/' \
                                          tools/split-image.py                           >/dev/null 2>&1 && ok || nok
 
 mkdir images || exit 1
@@ -107,12 +107,12 @@ check convert disk;                    qemu-img convert \
 
 check split disk;                      ../tools/split-image.py --zstd \
                                          28m disk.img 386bsd/disk-%d-%d.img             >/dev/null 2>&1 && ok || nok
-rm *disk.img || exit 1
+#rm *disk.img || exit 1
 
-
-find ./ >&2
 
 
 )|format
+
+find ./ >&2
 
 
