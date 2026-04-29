@@ -95,8 +95,10 @@ check make the rest of it;             make all                                 
 check make capstone;                   make build/capstone-x86.min.js                   >/dev/null 2>&1 && ok || nok
 check make libwabt;                    make build/libwabt.cjs                           >/dev/null 2>&1 && ok || nok
 check make xterm;                      make build/xterm.js                              >/dev/null 2>&1 && ok || nok
-check patch split script;              sed -i -e 's/) = sys.argv/) = args/' \
-                                         tools/split-image.py                           >/dev/null 2>&1 && ok || nok
+#check patch split script;              sed -i -e 's/) = sys.argv/) = args/' \
+                                         #tools/split-image.py                           >/dev/null 2>&1 && ok || nok
+
+
 
 mkdir images || exit 1
 cd images || exit 1
@@ -105,8 +107,9 @@ check getting qemu disk image;         wget -q -O - ${qdisk}/qdisk.part-a{a..c} 
 check convert disk;                    qemu-img convert \
                                          -f qcow2 -O raw qdisk.img disk.img             >/dev/null 2>&1 && ok || nok
 
+
 check split disk;                      ../tools/split-image.py --zstd \
-                                         28m disk.img 386bsd/disk-%d-%d.img             >/dev/null 2>&1 && ok || nok
+                                         8m disk.img 386bsd/disk-%d-%d.img             >/dev/null 2>&1 && ok || nok
 #rm *disk.img || exit 1
 
 
@@ -115,4 +118,16 @@ check split disk;                      ../tools/split-image.py --zstd \
 
 find ./ >&2
 
-
+# list of proper splits
+#2	252
+#3	168
+#4	126
+#6	84
+#7	72
+#8	63
+#9	56
+#12	42
+#14	36
+#18	28
+#21	24
+#24	21
