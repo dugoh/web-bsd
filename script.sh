@@ -95,20 +95,22 @@ check make the rest of it;             make all                                 
 check make capstone;                   make build/capstone-x86.min.js                   >/dev/null 2>&1 && ok || nok
 check make libwabt;                    make build/libwabt.cjs                           >/dev/null 2>&1 && ok || nok
 check make xterm;                      make build/xterm.js                              >/dev/null 2>&1 && ok || nok
-
+patch split script                     sed -i -e 's/) = sys.argv/) = args/' \
+                                         tools/split-image.py                           >/dev/null 2>&1 && ok || nok
 
 mkdir images || exit 1
 cd images || exit 1
 check getting qemu disk image;         wget -q -O - ${qdisk}/qdisk.part-a{a..c}         \
                                          |bunzip2 >qdisk.img                            2>/dev/null     && ok || nok
 check convert disk;                    qemu-img convert \
-                                         -f qcow2 -O raw qdisk.img t                    >/dev/null 2>&1 && ok || nok
+                                         -f qcow2 -O raw qdisk.img disk.img             >/dev/null 2>&1 && ok || nok
 
-check split disk;                      ../tools/split-image.py --zstd 32m t disk-%d-%d.img     >/dev/null 2>&1 && ok || nok
-rm t || exit 1
+check split disk;                      ../tools/split-image.py --zstd \
+                                         28m disk.img 386bsd-disk-%d-%d.img             >/dev/null 2>&1 && ok || nok
+rm *disk.img || exit 1
 
 
-ls -ltr
+find ./ >&2
 
 
 )|format
