@@ -16,7 +16,7 @@ jobs:
       - name: Install packages
         run: |
           sudo apt-get update
-          sudo apt-get install vsftpd libncursesw5-dev libtinfo-dev libc6-dev-i386
+          sudo apt-get install vsftpd libncursesw5-dev libtinfo-dev libc6-dev-i386 zstd
       - name: Execute main script file
         run: |
            ./init.sh
