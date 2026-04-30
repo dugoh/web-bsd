@@ -1,9 +1,9 @@
 #!/bin/bash
-# hellcheck disable=SC2015 # if echo fails we have bigger problems
-# hellcheck disable=SC2046 # intentional golfing
-# hellcheck disable=SC2210 # files named 1 or 2 confuses shellcheck
-# hellcheck disable=SC1004 # backslash+linefeed is processed again later
-# hellcheck disable=SC2196 # yeah, yeah .. egrep is non-standard and deprecated
+# shellcheck disable=SC2015 # if echo fails we have bigger problems
+# !hellcheck disable=SC2046 # intentional golfing
+# !hellcheck disable=SC2210 # files named 1 or 2 confuses shellcheck
+# !hellcheck disable=SC1004 # backslash+linefeed is processed again later
+# !hellcheck disable=SC2196 # yeah, yeah .. egrep is non-standard and deprecated
 
 function check {
   echo -ne "$*\t"
@@ -64,10 +64,6 @@ v86repo=https://github.com/copy/v86.git
 v86pin=b0794c9f574a490edaa1db6160c45b0d348201ef
 
 (
-
-
-
-
 cd /tmp || exit 1
 check download custom qemu;            wget -q -O - "${qemu_bin}"                       \
                                          |bunzip2 -c                                    \
@@ -79,12 +75,6 @@ check test qemu;                       qemu --help                              
 check setting qemu capabilities;       sudo setcap                                      \
                                          CAP_NET_ADMIN,CAP_NET_RAW=eip                  \
                                          /usr/local/bin/qemu                            >/dev/null 2>&1 && ok || nok
-
-                                         
-
-
-
-
 check fetch v86 repo;                  git clone "${v86repo}"                           >/dev/null 2>&1 && ok || nok
 cd v86 || exit 1
 check check out known good commit;     git checkout "${v86pin}"                         >/dev/null 2>&1 && ok || nok
@@ -95,30 +85,16 @@ check make the rest of it;             make all                                 
 check make capstone;                   make build/capstone-x86.min.js                   >/dev/null 2>&1 && ok || nok
 check make libwabt;                    make build/libwabt.cjs                           >/dev/null 2>&1 && ok || nok
 check make xterm;                      make build/xterm.js                              >/dev/null 2>&1 && ok || nok
-#check patch split script;              sed -i -e 's/) = sys.argv/) = args/' \
-                                         #tools/split-image.py                           >/dev/null 2>&1 && ok || nok
-
-
-
-mkdir images || exit 1
-cd images || exit 1
 check getting qemu disk image;         wget -q -O - ${qdisk}/qdisk.part-a{a..c}         \
                                          |bunzip2 >qdisk.img                            2>/dev/null     && ok || nok
-check convert disk;                    qemu-img convert \
+check convert disk to raw;             qemu-img convert \
                                          -f qcow2 -O raw qdisk.img disk.img             >/dev/null 2>&1 && ok || nok
-
-
-check split disk;                      ../tools/split-image.py --zstd \
-                                         8m disk.img 386bsd/disk-%d-%d.img             >/dev/null 2>&1 && ok || nok
-#rm *disk.img || exit 1
-
-
-
+check split and zstd compress disk;    ../tools/split-image.py --zstd \
+                                         1M disk.img 386bsd/%d-%d.img                   >/dev/null 2>&1 && ok || nok
 )|format
 
-ls -ltrd `find ./ |fgrep .img`
-
-# list of proper splits
+# list of proper nMB splits
+#1  504
 #2	252
 #3	168
 #4	126
