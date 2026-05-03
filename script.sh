@@ -89,7 +89,7 @@ check getting qemu disk image;         wget -q -O - ${qdisk}/qdisk.part-a{a..c} 
                                          |bunzip2 >qdisk.img                            2>/dev/null     && ok || nok
 check convert disk to raw;             qemu-img convert \
                                          -f qcow2 -O raw qdisk.img disk.img             >/dev/null 2>&1 && ok || nok
-check split and zstd compress disk;    ../tools/split-image.py --zstd \
+check split and zstd compress disk;    tools/split-image.py --zstd \
                                          1M disk.img 386bsd/%d-%d.img                   >/dev/null 2>&1 && ok || nok
 )|format
 
