@@ -51,7 +51,7 @@ function index {
 wd="$(pwd)"
 # For details on this custom qemu build, see
 # https://github.com/dugoh/gha-oldqemu
-# In short it is 0.11 patched to 
+# In short it is 0.11 patched to
 # - build in todays Action runner
 # - run headless
 qemu_bin=https://dugoh.github.io/gha-oldqemu/qemu.tar.bz2
@@ -87,23 +87,188 @@ check make libwabt;                    make build/libwabt.cjs                   
 check make xterm;                      make build/xterm.js                              >/dev/null 2>&1 && ok || nok
 check getting qemu disk image;         wget -q -O - ${qdisk}/qdisk.part-a{a..c}         \
                                          |bunzip2 >qdisk.img                            2>/dev/null     && ok || nok
-check convert disk to raw;             qemu-img convert \
-                                         -f qcow2 -O raw qdisk.img disk.img             >/dev/null 2>&1 && ok || nok
-check split and zstd compress disk;    tools/split-image.py --zstd \
-                                         1M disk.img 386bsd/%d-%d.img                   >/dev/null 2>&1 && ok || nok
+#check convert disk to raw;             qemu-img convert \
+#                                         -f qcow2 -O raw qdisk.img disk.img             >/dev/null 2>&1 && ok || nok
+
+
+check getting raw second disk;         wget -q -O - ${qdisk}/pdisk.img.bz2 \
+                                         |bunzip2 >pdisk.img                            2>/dev/null     && ok || nok
+check convert second disk to qcow2;    qemu-img convert \
+                                         -f raw -O qcow2 pdisk.img qdisk2.img           >/dev/null 2>&1 && ok || nok
+
+
+
+#check split and zstd compress disk;    tools/split-image.py --zstd \
+#                                         1M disk.img 386bsd/%d-%d.img                   >/dev/null 2>&1 && ok || nok
 )|format
 
-# list of proper nMB splits
-#1  504
-#2	252
-#3	168
-#4	126
-#6	84
-#7	72
-#8	63
-#9	56
-#12	42
-#14	36
-#18	28
-#21	24
-#24	21
+cd "${wd}/v86"
+
+cat >1.cmd <<"__EOF1__"
+root
+
+exec /usr/othersrc/public/bash-1.12/bin/bash
+ulimit -d 32768
+set +H
+touch /fastboot
+f=/tmp/earlyboot.list
+echo "/" >>$f
+echo "/bin" >>$f
+echo "/etc" >>$f
+echo "/sbin" >>$f
+echo "/usr" >>$f
+echo "/usr/sbin" >>$f
+echo "/usr/bin" >>$f
+echo "/tmp" >>$f
+echo "/dev" >>$f
+echo "/var" >>$f
+echo "/var/log" >>$f
+echo "/var/run" >>$f
+echo "/var/crash" >>$f
+echo "/var/tmp" >>$f
+echo "/var/cron" >>$f
+echo "/var/cron/tabs" >>$f
+echo "/var/spool/lpd" >>$f
+echo "/var/spool/mqueue" >>$f
+echo "/var/spool/output" >>$f
+echo "/var/spool/uucp" >>$f
+echo "/usr/libexec" >>$f
+echo "/usr/share" >>$f
+echo "/usr/share/zoneinfo" >>$f
+echo "/sbin/init" >>$f
+echo "/bin/sh" >>$f
+echo "/etc/rc" >>$f
+echo "/fastboot" >>$f
+echo "/bin/stty" >>$f
+echo "/bin/[" >>$f
+echo "/sbin/swapon" >>$f
+echo "/etc/fstab" >>$f
+echo "/sbin/umount" >>$f
+echo "/sbin/mount" >>$f
+echo "/bin/rm" >>$f
+echo "/etc/netstart" >>$f
+echo "/bin/cat" >>$f
+echo "/etc/myname" >>$f
+echo "/bin/hostname" >>$f
+echo "/sbin/ifconfig" >>$f
+echo "/etc/hosts" >>$f
+echo "/bin/cp" >>$f
+echo "/bin/chmod" >>$f
+echo "/usr/sbin/syslogd" >>$f
+echo "/etc/services" >>$f
+echo "/var/run/syslog.pid" >>$f
+echo "/etc/syslog.conf" >>$f
+echo "/var/log/messages" >>$f
+echo "/var/log/maillog" >>$f
+echo "/var/log/lpd-errs" >>$f
+echo "/etc/localtime" >>$f
+echo "/var/run/utmp" >>$f
+echo "/sbin/savecore" >>$f
+echo "/386bsd" >>$f
+echo "/usr/sbin/kvm_mkdb" >>$f
+echo "/var/run//kvm_386bsd.db" >>$f
+echo "/usr/sbin/dev_mkdb" >>$f
+echo "/var/run//dev.db" >>$f
+echo "/usr/libexec/elvispreserve" >>$f
+echo "/usr/bin/find" >>$f
+echo "/usr/sbin/update" >>$f
+echo "/usr/libexec/crond" >>$f
+echo "/var/run/crond.pid" >>$f
+echo "/sbin/routed" >>$f
+echo "/usr/sbin/lpd" >>$f
+echo "/var/spool/output/lpd.lock" >>$f
+echo "/etc/printcap" >>$f
+echo "/etc/exports" >>$f
+echo "/usr/sbin/sendmail" >>$f
+echo "/etc/spwd.db" >>$f
+echo "/usr/share/zoneinfo/GMT" >>$f
+echo "/etc/sendmail.cf" >>$f
+echo "/usr/sbin/inetd" >>$f
+echo "/etc/inetd.conf" >>$f
+echo "/etc/rc.local" >>$f
+echo "/etc/motd" >>$f
+echo "/usr/bin/strings" >>$f
+echo "/usr/bin/sed" >>$f
+echo "/bin/date" >>$f
+echo "/usr/bin/grep" >>$f
+
+echo "/usr/libexec/getty" >>$f
+echo "/etc/ttys" >>$f
+echo "/etc/gettytab" >>$f
+
+echo "/etc/passwd" >>$f
+echo "/etc/master.passwd" >>$f
+echo "/usr/share/misc" >>$f
+echo "/usr/share/misc/termcap" >>$f
+echo "/etc/termcap" >>$f
+
+echo "/usr/bin/login" >>$f
+echo "/root" >>$f
+echo "/root/.profile" >>$f
+echo "/root/.cshrc" >>$f
+echo "/root/.login" >>$f
+echo "/dev/MAKEDEV" >>$f
+echo "/.profile" >>$f
+echo "/bin/csh"  >>$f
+
+echo "/bin/sleep" >>$f
+echo "/bin/ps" >>$f
+echo "/bin/ls" >>$f
+echo "/bin/df" >>$f
+echo "/usr/bin/more" >>$f
+
+# Batch 2 moved into /tmp/doe to avoid slowcat buffer overrun
+echo "# Batch 2: find-based file discovery" >/tmp/doe
+# XXX
+#echo "cp /tmp/doe /etc/" >>/tmp/doe
+echo "find /etc      -type f >>$f" >>/tmp/doe
+echo "find /bin      -type f >>$f" >>/tmp/doe
+echo "find /sbin     -type f >>$f" >>/tmp/doe
+echo "find /usr/bin      -type f >>$f" >>/tmp/doe
+echo "find /usr/libexec  -type f >>$f" >>/tmp/doe
+echo "find /usr/sbin     -type f >>$f" >>/tmp/doe
+echo "find /usr/share    -type f >>$f" >>/tmp/doe
+# XXX
+#echo "cp $f /etc" >>/tmp/doe
+echo "find / -type f | grep -v '^/tmp' | grep -v '^/dev/' | grep -v '^/mnt' >>$f" >>/tmp/doe
+echo "awk '!seen[\$0]++' $f >/tmp/earlyboot.uniq && mv /tmp/earlyboot.uniq $f" >>/tmp/doe
+echo "" >>/tmp/doe
+echo "mount /dev/wd1a /mnt" >>/tmp/doe
+echo "rm -rf /mnt/* /mnt/.p*" >>/tmp/doe
+echo "sync; sync; sync" >>/tmp/doe
+echo "cat $f | cpio -p -d -m -u /mnt" >>/tmp/doe
+echo "cd /mnt/dev" >>/tmp/doe
+echo "sh MAKEDEV all" >>/tmp/doe
+echo "cd /" >>/tmp/doe
+echo "sync; sync; sync" >>/tmp/doe
+echo "umount /dev/wd1a" >>/tmp/doe
+echo "fsck /dev/rwd1a" >>/tmp/doe
+echo "fsck /dev/rwd1a" >>/tmp/doe
+echo "shutdown -rf now" >>/tmp/doe
+chmod +x /tmp/doe; /tmp/doe
+__EOF1__
+
+echo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+echo seventh boot
+echo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+touch out
+(
+  until egrep -q 'login:|console' out ; do
+    sleep 5;
+  done
+  sleep 5
+  slowcat ./1.cmd 1 .1
+)| TERM=vt100 script -f -c 'qemu          \
+                -L /usr/local/share/qemu/ \
+                -curses                   \
+                -hda qdisk.img            \
+                -hdb qdisk2.img           \
+                -M isapc                  \
+                -net nic                  \
+                -no-reboot                \
+                -m 64                     \
+                -startdate "1994-04-23"'  \
+ |tee -a out
+echo %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+echo
+mv out out_1.txt
